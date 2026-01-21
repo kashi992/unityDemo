@@ -144,20 +144,10 @@
 
       // Function to update the percentage display
       function updatePercentage(percentage) {
-        document.getElementById('loading-text').innerText = percentage + '%';
+        document.getElementById('loading-text').innerText = Math.round(percentage) + '%';
       }
 
-      let percentage = 0;
-      let loadingInterval = setInterval(() => {
-        if (percentage >= 100) {
-          clearInterval(loadingInterval);
-        } else {
-          percentage++;
-          updatePercentage(percentage);
-        }
-      }, 80);  // This simulates the progress every 80ms for an 8-second loading period
-
-      // Create Unity instance
+      // Create Unity instance and track loading progress
       createUnityInstance(canvas, {
         arguments: [],
         dataUrl: "Build/MVP2.data",
@@ -167,6 +157,12 @@
         companyName: "DefaultCompany",
         productName: "Byrsa_Visualization",
         productVersion: "0.1.0",
+        // Using onProgress to track loading progress
+        onProgress: function (progress) {
+          const percentage = progress * 100;
+          updatePercentage(percentage);
+          console.log('Loading progress:', percentage); // Debugging output
+        }
       }).then((unityInstance) => {
         // Unity instance initialized
         // Hide the loading container when Unity is ready
