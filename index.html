@@ -139,6 +139,23 @@
 
       }
 
+      // Function to update the percentage display
+      function updatePercentage(percentage) {
+        document.getElementById('loading-text').innerText = Math.round(percentage) + '%';
+      }
+
+      let percentage = 0;
+
+      // Simulate the loading progress for 10 seconds
+      let loadingInterval = setInterval(() => {
+        if (percentage >= 100) {
+          clearInterval(loadingInterval);
+        } else {
+          percentage++;
+          updatePercentage(percentage);
+        }
+      }, 100);  // This simulates the progress every 100ms for 10 seconds
+
       createUnityInstance(document.querySelector("#unity-canvas"), {
         arguments: [],
         dataUrl: "Build/DemoBuildNoUnity.data",
