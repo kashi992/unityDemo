@@ -109,6 +109,9 @@
         text-shadow: 0px 0px 10px rgba(0, 255, 255, 0.8);
         z-index: 10;
       }
+      #unity-canvas-container{
+        padding-top: 30px;
+      }
 
     </style>
   </head>
@@ -119,8 +122,9 @@
       <!-- Percentage text -->
       <div id="loading-text">0%</div>
     </div>
-
-    <canvas id="unity-canvas" width=960 height=600 tabindex="-1" style="width: 960px; height: 600px; background: #231F20; padding-top: 30px; "></canvas>
+<div id="unity-canvas-container">
+<canvas id="unity-canvas" width=960 height=600 tabindex="-1" style="width: 960px; height: 600px; background: #231F20;"></canvas>
+</div>
     <script src="Build/DemoBuildNoUnity.loader.js"></script>
     <script>
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
