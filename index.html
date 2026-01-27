@@ -150,7 +150,23 @@
         productVersion: "0.1.0",
         // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
         // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
+        // Track Unity loading progress
+        onProgress: function (progress) {
+          // If Unity loads before 10 seconds, hide the loading container
+          const unityProgress = progress * 100;
+          updatePercentage(unityProgress);
+
+          // If Unity is loaded, hide the loading container
+          if (unityProgress === 100) {
+            document.getElementById('loading-container').style.display = 'none';
+          }
+        }
+
       }).then((unityInstance) => {
+                // Unity instance initialized
+        console.log('Unity is loaded.');
+        // Hide loading container when Unity finishes loading
+        document.getElementById('loading-container').style.display = 'none';
       }).catch((message) => {
         alert(message);
       });
