@@ -134,15 +134,16 @@
       document.getElementById("loading-text").innerText = Math.round(pct) + "%";
     }
 
-    var buildUrl = "https://unity-build-folders.s3.ap-southeast-2.amazonaws.com/Build";
+var CDN = "https://d1qy305ek4jct4.cloudfront.net";
+    var buildUrl = CDN + "/Build";
     // https://unity-build-folders.s3.ap-southeast-2.amazonaws.com/Build/MVP2.loader.js
     var loaderUrl = buildUrl + "/Default.loader.js";
     var config = {
-      arguments: [],
+      // arguments: [],
       dataUrl: buildUrl + "/Default.data",
       frameworkUrl: buildUrl + "/Default.framework.js",
       codeUrl: buildUrl + "/Default.wasm",
-      streamingAssetsUrl: "https://unity-build-folders.s3.ap-southeast-2.amazonaws.com/StreamingAssets",
+      streamingAssetsUrl: CDN + "/StreamingAssets",
       companyName: "DefaultCompany",
       productName: "LUCID EDGE_Visualisation",
       productVersion: "0.1.0",
