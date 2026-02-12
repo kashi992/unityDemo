@@ -4,14 +4,97 @@
     <meta charset="utf-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Unity Web Player | LUCID EDGE_Visualisation</title>
+
+    <!-- Custom Loader Styles (from previous project) -->
+    <style>
+      /* ===== FULLSCREEN BASE ===== */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+      }
+
+      #unity-container {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #unity-canvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+        background: #000;
+      }
+
+      /* ===== LOADER ===== */
+      #loading-container {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.85);
+      }
+
+      .circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 6px solid transparent;
+        border-top: 6px solid #00ff99;
+        border-bottom: 6px solid #00b380;
+        animation: rotate 1.2s linear infinite;
+        position: relative;
+      }
+
+      @keyframes rotate {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      #loading-text {
+        position: absolute;
+        font-family: Arial, sans-serif;
+        font-size: 18px;
+        color: #00ff99;
+        font-weight: bold;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+    </style>
   </head>
 
-  <body style="text-align: center; padding: 0; border: 0; margin: 0;">
-    <canvas id="unity-canvas" width="960" height="600" tabindex="-1"
-      style="width: 960px; height: 600px; background: #231F20"></canvas>
+  <body>
+    <!-- Custom Loader Markup (from previous project) -->
+    <div id="loading-container">
+      <div class="circle"></div>
+      <div id="loading-text">0%</div>
+    </div>
+
+    <!-- Unity Canvas Wrapper (to match previous layout) -->
+    <div id="unity-container">
+      <canvas id="unity-canvas" tabindex="-1"></canvas>
+      <div id="unity-warning"></div>
+    </div>
 
     <script>
+      /* ===== SUPPRESS UNITY ALERTS (keep custom loader clean) ===== */
+      window.alert = function () {};
+
       const canvas = document.querySelector("#unity-canvas");
+
+      function updatePercentage(pct) {
+        document.getElementById("loading-text").innerText = Math.round(pct) + "%";
+      }
 
       // Mobile device style
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
@@ -21,6 +104,7 @@
           "width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes";
         document.head.appendChild(meta);
 
+        // Keep fullscreen behavior on mobile too
         canvas.style.width = "100%";
         canvas.style.height = "100%";
         canvas.style.position = "fixed";
@@ -42,25 +126,39 @@
         productVersion: "0.1.0",
       };
 
-      // ✅ Load Unity loader FIRST
+      // ✅ Load Unity loader script (required) — we are only replacing the DEFAULT Unity loading UI
       const script = document.createElement("script");
       script.src = loaderUrl;
 
       script.onload = () => {
-        // ✅ Now createUnityInstance exists
-        createUnityInstance(canvas, config)
+        // ✅ Use custom loader progress callback (from previous project)
+        createUnityInstance(canvas, config, (progress) => {
+          updatePercentage(progress * 100);
+        })
           .then((unityInstance) => {
-            console.log("Unity loaded", unityInstance);
+            // Hide custom loader when ready
+            document.getElementById("loading-container").style.display = "none";
+
+            /* ===== FULLSCREEN ON FIRST USER CLICK (SAFE) ===== */
+            let fullscreenTriggered = false;
+
+            const requestFullscreenOnce = () => {
+              if (!fullscreenTriggered) {
+                fullscreenTriggered = true;
+                unityInstance.SetFullscreen(1);
+                document.removeEventListener("click", requestFullscreenOnce);
+              }
+            };
+
+            document.addEventListener("click", requestFullscreenOnce);
           })
-          .catch((message) => {
-            console.error("Unity failed:", message);
-            alert(message);
+          .catch((err) => {
+            console.error("Unity failed:", err);
           });
       };
 
       script.onerror = () => {
-        console.error("Failed to load loader:", loaderUrl);
-        alert("Failed to load Unity loader script.");
+        console.error("Failed to load Unity loader script:", loaderUrl);
       };
 
       document.body.appendChild(script);
