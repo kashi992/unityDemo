@@ -1,172 +1,229 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Unity Web Player | LUCID EDGE_Visualisation</title>
 
-    <style>
-      html, body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        width: 100%;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #0e0b19;
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Unity Web Player | LUCID EDGE_Visualisation</title>
+  <link rel="shortcut icon" href="TemplateData/favicon.ico" />
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #0e0b19;
+    }
+
+    #unity-container {
+      position: relative;
+      height: 100%;
+      width: 100%;
+    }
+
+    #unity-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #231F20;
+    }
+
+    /* ---- Custom loader (your loader) ---- */
+    #loading-container {
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 6px solid #2e2e2e;
+      background-color: rgba(0, 0, 0, 0.7);
+      box-shadow: 0px 0px 25px rgba(0, 255, 255, 0.5);
+      z-index: 20;
+    }
+
+    .circle {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 6px solid transparent;
+      border-top: 6px solid #00ff99;
+      border-bottom: 6px solid #00b380;
+      animation: rotate 10s linear infinite, pulse 1.5s infinite ease-in-out;
+    }
+
+    @keyframes rotate {
+      0% {
+        transform: rotate(0deg);
       }
 
-      #unity-canvas {
-        width: 100%;
-        height: 100%;
-        display: block;
-        background: #231F20;
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
       }
 
-      #loading-container {
-        position: absolute;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        border: 6px solid #2e2e2e;
-        background-color: rgba(0, 0, 0, 0.7);
-        box-shadow: 0px 0px 25px rgba(0, 255, 255, 0.5);
-        z-index: 20;
+      50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
       }
 
-      .circle {
-        position: relative;
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        border: 6px solid transparent;
-        border-top: 6px solid #00ff99;
-        border-bottom: 6px solid #00b380;
-        animation: rotate 10s linear infinite, pulse 1.5s infinite ease-in-out;
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+      }
+    }
+
+    .circle::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 15px;
+      height: 15px;
+      background-color: #00ff99;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      animation: moveDot 10s linear infinite;
+    }
+
+    @keyframes moveDot {
+      0% {
+        transform: translateX(-50%) rotate(0deg) translateY(-50px);
       }
 
-      @keyframes rotate {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+      100% {
+        transform: translateX(-50%) rotate(360deg) translateY(-50px);
       }
+    }
 
-      @keyframes pulse {
-        0% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); }
-        50% { transform: scale(1.1); box-shadow: 0 0 30px rgba(0, 255, 255, 0.8); }
-        100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); }
-      }
+    #loading-text {
+      position: absolute;
+      font-family: Arial, sans-serif;
+      font-size: 18px;
+      color: #00ff99;
+      font-weight: bold;
+      text-shadow: 0px 0px 10px rgba(0, 255, 255, 0.8);
+      z-index: 21;
+    }
 
-      .circle::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 50%;
-        width: 15px;
-        height: 15px;
-        background-color: #00ff99;
-        border-radius: 50%;
-        transform: translateX(-50%);
-        animation: moveDot 10s linear infinite;
-      }
+    /* ---- Disable Unity default UI (if present in TemplateData/style.css) ---- */
+    #unity-loading-bar,
+    #unity-footer,
+    #unity-warning {
+      display: none !important;
+    }
+  </style>
+</head>
 
-      @keyframes moveDot {
-        0% { transform: translateX(-50%) rotate(0deg) translateY(-50px); }
-        100% { transform: translateX(-50%) rotate(360deg) translateY(-50px); }
-      }
-
-      #loading-text {
-        position: absolute;
-        font-family: Arial, sans-serif;
-        font-size: 18px;
-        color: #00ff99;
-        font-weight: bold;
-        text-shadow: 0px 0px 10px rgba(0, 255, 255, 0.8);
-        z-index: 21;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div id="loading-container">
+<body>
+  <div id="unity-container">
+    <!-- Custom loader -->
+    <div id="loading-container" aria-live="polite">
       <div class="circle"></div>
       <div id="loading-text">0%</div>
     </div>
 
     <canvas id="unity-canvas" tabindex="-1"></canvas>
+  </div>
 
-    <script>
-      const canvas = document.querySelector("#unity-canvas");
+  <script>
+    const canvas = document.querySelector("#unity-canvas");
 
-      // Mobile viewport tweaks
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        const meta = document.createElement("meta");
-        meta.name = "viewport";
-        meta.content =
-          "width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes";
-        document.head.appendChild(meta);
+    // Mobile viewport tweaks
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      const meta = document.createElement("meta");
+      meta.name = "viewport";
+      meta.content =
+        "width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes";
+      document.head.appendChild(meta);
+    }
 
-        canvas.style.width = "100%";
-        canvas.style.height = "100%";
-        canvas.style.position = "fixed";
-        document.body.style.textAlign = "left";
-      }
+    function setProgress(percent) {
+      const el = document.getElementById("loading-text");
+      if (el) el.innerText = Math.round(percent) + "%";
+    }
 
-      // Optional: match canvas to window
-      function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
-      resizeCanvas();
-      window.addEventListener("resize", resizeCanvas);
+    function hideLoader() {
+      const el = document.getElementById("loading-container");
+      if (el) el.style.display = "none";
+    }
 
-      function setProgress(p) {
-        document.getElementById("loading-text").innerText = Math.round(p) + "%";
-      }
-      function hideLoader() {
-        const el = document.getElementById("loading-container");
-        if (el) el.style.display = "none";
-      }
+    // Optional: match canvas drawing buffer to window size (Unity will also manage canvas sizing)
+    function resizeCanvas() {
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
 
-      /* ✅ CDN base */
-      const CDN = "https://d1qy305ek4jct4.cloudfront.net";
-      const buildUrl = CDN + "/Build";
+    const CDN_BASE = "https://d1qy305ek4jct4.cloudfront.net";
 
-      /* ✅ Loader file from CDN */
-      const loaderUrl = buildUrl + "/Compressed.loader.js";
+    // Unity build is inside CDN_BASE/Build and CDN_BASE/StreamingAssets
+    const buildUrl = CDN_BASE + "/Build";
+    const loaderUrl = buildUrl + "/Compressed.loader.js";
 
-      /* ✅ Unity config using CDN paths */
-      const config = {
-        arguments: [],
-        dataUrl: buildUrl + "/Compressed.data.br",
-        frameworkUrl: buildUrl + "/Compressed.framework.js.br",
-        codeUrl: buildUrl + "/Compressed.wasm.br",
-        streamingAssetsUrl: CDN + "/StreamingAssets",
-        companyName: "DefaultCompany",
-        productName: "LUCID EDGE_Visualisation",
-        productVersion: "0.1.0",
-      };
+    // Optional banner function (if you still want warnings/errors)
+    function unityShowBanner(msg, type) {
+      // Simple fallback: alert on error, console for warning
+      if (type === "error") alert(msg);
+      else console.warn(msg);
+    }
 
-      // ✅ Dynamically load the Unity loader from CDN
-      const script = document.createElement("script");
-      script.src = loaderUrl;
-      script.onload = () => {
-        createUnityInstance(canvas, config, (progress) => {
+    const config = {
+      arguments: [],
+      dataUrl: buildUrl + "/Compressed.data.br",
+      frameworkUrl: buildUrl + "/Compressed.framework.js.br",
+      codeUrl: buildUrl + "/Compressed.wasm.br",
+     streamingAssetsUrl: CDN_BASE + "/StreamingAssets",
+      companyName: "DefaultCompany",
+      productName: "LUCID EDGE_Visualisation",
+      productVersion: "0.1.0",
+      showBanner: unityShowBanner,
+    };
+
+    // Dynamically load Unity loader
+    const script = document.createElement("script");
+    script.src = loaderUrl;
+
+    script.onload = () => {
+      createUnityInstance(canvas, config, (progress) => {
           const percent = progress * 100;
           setProgress(percent);
+
+          // Hide when complete (sometimes progress reaches 0.9 then finishes suddenly,
+          // so we ALSO hide in the .then() below)
           if (percent >= 100) hideLoader();
         })
-          .then(() => hideLoader())
-          .catch((message) => alert(message));
-      };
-      script.onerror = () => {
-        alert("Failed to load Unity loader from CDN: " + loaderUrl);
-      };
-      document.body.appendChild(script);
-    </script>
-  </body>
+        .then(() => {
+          hideLoader();
+        })
+        .catch((message) => {
+          alert(message);
+        });
+    };
+
+    script.onerror = () => {
+      alert("Failed to load Unity loader: " + loaderUrl);
+    };
+
+    document.body.appendChild(script);
+  </script>
+</body>
+
 </html>
