@@ -180,14 +180,17 @@
       updateBannerVisibility();
     }
 
-    var buildUrl = "Build";
+     const CDN_BASE = "https://d1qy305ek4jct4.cloudfront.net";
+
+    // Unity build is inside CDN_BASE/Build and CDN_BASE/StreamingAssets
+    const buildUrl = CDN_BASE + "/Build";
     var loaderUrl = buildUrl + "/CompressedGAMUDA.loader.js";
     var config = {
       arguments: [],
       dataUrl: buildUrl + "/CompressedGAMUDA.data.br",
       frameworkUrl: buildUrl + "/CompressedGAMUDA.framework.js.br",
       codeUrl: buildUrl + "/CompressedGAMUDA.wasm.br",
-      streamingAssetsUrl: "StreamingAssets",
+      streamingAssetsUrl: CDN_BASE + "StreamingAssets",
       companyName: "DefaultCompany",
       productName: "LUCID EDGE_Visualisation",
       productVersion: "0.1.0",
